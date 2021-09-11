@@ -133,6 +133,7 @@ Rails.application.routes.draw do
       get "closing", to: "closing#index"
       post "closing/extend_holds", to: "closing#extend_holds"
       resources :library_updates
+      resources :email_templates
     end
 
     resources :holds, only: [:index]
