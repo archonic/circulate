@@ -12,7 +12,7 @@ class ApplicationController < ActionController::Base
 
   add_flash_types :success, :error, :warning
 
-  before_action :set_raven_context
+  before_action :set_sentry_context
   around_action :set_time_zone
   around_action :override_time_in_development, if: -> { Rails.env.development? }
 
@@ -60,9 +60,9 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def set_raven_context
+  def set_sentry_context
     if user_signed_in?
-      Raven.user_context(id: current_user.id, member_id: current_member.try(:id))
+      Sentry.set_user(id: current_user.id, member_id: current_member.try(:id))
     end
   end
 

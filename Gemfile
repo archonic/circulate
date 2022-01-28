@@ -45,7 +45,6 @@ gem "store_model"
 
 gem "square.rb"
 gem "aws-sdk-s3", require: false
-gem "sentry-raven"
 gem "omniauth-google-oauth2"
 gem "omniauth-rails_csrf_protection"
 
@@ -55,6 +54,8 @@ gem "mini_magick"
 gem "barnes"
 gem "sucker_punch"
 gem "dotenv-rails"
+
+gem "sentry-rails"
 gem "appsignal"
 
 gem "chronic"
