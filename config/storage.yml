@@ -13,6 +13,15 @@ amazon:
   region: <%= ENV['BUCKETEER_AWS_REGION'] %>
   bucket: <%= ENV['BUCKETEER_BUCKET_NAME'] %>
 
+minio:
+  service: S3
+  access_key_id: minioadmin
+  secret_access_key: minioadmin
+  region: us-east-1
+  bucket: your_own_bucket
+  endpoint: "http://127.0.0.1:9000"
+  force_path_style: true
+
 # Use rails credentials:edit to set the AWS secrets (as aws:access_key_id|secret_access_key)
 # amazon:
 #   service: S3

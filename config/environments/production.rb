@@ -32,14 +32,14 @@ Rails.application.configure do
   # config.action_controller.asset_host = 'http://assets.example.com'
 
   config.action_mailer.default_url_options = {host: "app.chicagotoollibrary.org"}
-  config.action_mailer.asset_host = "https://app.chicagotoollibrary.org"
+  config.action_mailer.asset_host = "http://app.chicagotoollibrary.org"
 
   # Specifies the header that your server uses for sending files.
   # config.action_dispatch.x_sendfile_header = 'X-Sendfile' # for Apache
   # config.action_dispatch.x_sendfile_header = 'X-Accel-Redirect' # for NGINX
 
   # Store uploaded files on the local file system (see config/storage.yml for options).
-  config.active_storage.service = :amazon
+  config.active_storage.service = ENV.fetch("ACTIVE_STORAGE_SERVICE", :amazon)
 
   config.active_storage.variable_content_types << "image/webp"
 
@@ -49,7 +49,8 @@ Rails.application.configure do
   # config.action_cable.allowed_request_origins = [ 'http://example.com', /http:\/\/example.*/ ]
 
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
-  config.force_ssl = true
+  config.force_ssl = false
+  config.ssl_options = {redirect: false, secure_cookies: false, hsts: false}
 
   # Use the lowest log level to ensure availability of diagnostic information
   # when problems arise.
