@@ -62,6 +62,10 @@ Rails.application.routes.draw do
   get "/auth/failure", to: "volunteer/sessions#failure"
 
   namespace :admin do
+    resource :grid, only: :show do
+      get :data, on: :member
+    end
+
     resources :documents, only: [:show, :edit, :update, :index]
     resources :borrow_policies, only: [:index, :edit, :update]
     resources :categories, except: :show
@@ -74,6 +78,8 @@ Rails.application.routes.draw do
       resource :completion, only: [:create, :destroy], controller: :appointment_completions
     end
     resources :manage_features, only: [:index, :update]
+
+
     resources :items do
       scope module: "items" do
         resources :attachments
