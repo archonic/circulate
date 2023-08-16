@@ -9,6 +9,7 @@
     "@rails/webpacker": "^5.4.3",
     "awesomplete": "^1.1.4",
     "feather-icons": "^4.25.0",
+    "handsontable": "^13.0.0",
     "jquery": "^3.6.0",
     "mjml": "^4.12.0",
     "selectize": "^0.12.6",
