@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_10_30_174955) do
+ActiveRecord::Schema.define(version: 2023_09_02_193652) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
   enable_extension "plpgsql"
@@ -63,6 +63,12 @@ ActiveRecord::Schema.define(version: 2022_10_30_174955) do
   ], force: :cascade
 
   create_enum :renewal_request_status, [
+    "requested",
+    "approved",
+    "rejected"
+  ], force: :cascade
+
+  create_enum :reservation_status, [
     "requested",
     "approved",
     "rejected"
@@ -464,6 +470,16 @@ ActiveRecord::Schema.define(version: 2022_10_30_174955) do
     t.index ["loan_id"], name: "index_renewal_requests_on_loan_id"
   end
 
+  create_table "reservations", force: :cascade do |t|
+    t.datetime "started_at"
+    t.datetime "ended_at"
+    t.enum "status", enum_type: "reservation_status"
+    t.bigint "reserved_by_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["reserved_by_id"], name: "index_reservations_on_reserved_by_id"
+  end
+
   create_table "short_links", force: :cascade do |t|
     t.string "url", null: false
     t.string "slug", null: false
@@ -520,6 +536,11 @@ ActiveRecord::Schema.define(version: 2022_10_30_174955) do
     t.enum "role", default: "member", null: false, enum_type: "user_role"
     t.bigint "member_id"
     t.integer "library_id"
+    t.string "confirmation_token"
+    t.datetime "confirmed_at"
+    t.datetime "confirmation_sent_at"
+    t.string "unconfirmed_email"
+    t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["email", "library_id"], name: "index_users_on_email_and_library_id"
     t.index ["email"], name: "index_users_on_email"
     t.index ["library_id"], name: "index_users_on_library_id"
@@ -552,6 +573,7 @@ ActiveRecord::Schema.define(version: 2022_10_30_174955) do
   add_foreign_key "notes", "users", column: "creator_id"
   add_foreign_key "notifications", "members"
   add_foreign_key "renewal_requests", "loans"
+  add_foreign_key "reservations", "users", column: "reserved_by_id"
   add_foreign_key "ticket_updates", "audits"
   add_foreign_key "ticket_updates", "tickets"
   add_foreign_key "ticket_updates", "users", column: "creator_id"
