@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_09_02_193652) do
+ActiveRecord::Schema.define(version: 2023_09_02_195237) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
   enable_extension "plpgsql"
@@ -470,13 +470,27 @@ ActiveRecord::Schema.define(version: 2023_09_02_193652) do
     t.index ["loan_id"], name: "index_renewal_requests_on_loan_id"
   end
 
+  create_table "reservation_line_items", force: :cascade do |t|
+    t.string "reserveable_type", null: false
+    t.bigint "reservable_id", null: false
+    t.bigint "reservation_id", null: false
+    t.bigint "created_by_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["created_by_id"], name: "index_reservation_line_items_on_created_by_id"
+    t.index ["reservable_id"], name: "index_reservation_line_items_on_reservable_id"
+    t.index ["reservation_id"], name: "index_reservation_line_items_on_reservation_id"
+  end
+
   create_table "reservations", force: :cascade do |t|
     t.datetime "started_at"
     t.datetime "ended_at"
     t.enum "status", enum_type: "reservation_status"
     t.bigint "reserved_by_id", null: false
+    t.bigint "parent_reservation_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.index ["parent_reservation_id"], name: "index_reservations_on_parent_reservation_id"
     t.index ["reserved_by_id"], name: "index_reservations_on_reserved_by_id"
   end
 
@@ -573,6 +587,9 @@ ActiveRecord::Schema.define(version: 2023_09_02_193652) do
   add_foreign_key "notes", "users", column: "creator_id"
   add_foreign_key "notifications", "members"
   add_foreign_key "renewal_requests", "loans"
+  add_foreign_key "reservation_line_items", "reservations"
+  add_foreign_key "reservation_line_items", "users", column: "created_by_id"
+  add_foreign_key "reservations", "reservations", column: "parent_reservation_id"
   add_foreign_key "reservations", "users", column: "reserved_by_id"
   add_foreign_key "ticket_updates", "audits"
   add_foreign_key "ticket_updates", "tickets"

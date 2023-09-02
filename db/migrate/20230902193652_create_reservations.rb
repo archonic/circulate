@@ -7,6 +7,7 @@ class CreateReservations < ActiveRecord::Migration[6.1]
       t.datetime :ended_at
       t.enum :status, enum_type: :reservation_status
       t.references :reserved_by, null: false, foreign_key: {to_table: :users}
+      t.references :parent_reservation, foreign_key: {to_table: :reservations}
 
       t.timestamps
     end
