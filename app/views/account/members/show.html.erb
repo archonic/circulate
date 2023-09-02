@@ -18,7 +18,10 @@
       <dd class="title_bold"><%= @member.display_pronouns %></dd>
 
       <dt class="caption">Email</dt>
-      <dd class="title_bold"><%= @member.email %></dd>
+      <dd class="title_bold">
+        <%= @member.email %>
+        <% unless @member.user.confirmed? %>unconfirmed<% end %>
+      </dd>
 
       <dt class="caption">Phone Number</dt>
       <dd class="title_bold"><%= format_phone_number(@member.phone_number, "-") %></dd>

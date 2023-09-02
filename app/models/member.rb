@@ -121,7 +121,7 @@ class Member < ApplicationRecord
   private
 
   def update_user_email
-    user.update_column(:email, email) if user && !user.new_record? # Skip validations
+    user.update(email: email) if user && !user.new_record? # Skip validations
   end
 
   def update_neon_crm

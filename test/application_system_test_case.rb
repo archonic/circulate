@@ -132,11 +132,21 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     find(:rich_text_area, locator).execute_script("this.editor.loadHTML(arguments[0])", with.to_s)
   end
 
+  def assert_singlepart_email(to:)
+    delivered_mail = ActionMailer::Base.deliveries.last
+    assert_equal [to], delivered_mail.to
+
+    body = Capybara.string(delivered_mail.body.to_s)
+    yield body
+  end
+
   def assert_delivered_email(to:, &block)
     delivered_mail = ActionMailer::Base.deliveries.last
     assert_equal [to], delivered_mail.to
 
-    assert delivered_mail.body.parts.size == 2, "non multipart email was sent!"
+    if require_multipart
+      assert delivered_mail.body.parts.size == 2, "non multipart email was sent!"
+    end
 
     if delivered_mail.attachments.size > 0
       text = delivered_mail.body.parts[0].body.parts[0].body
@@ -152,6 +162,16 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
 
   def assert_date_displayed(datetime)
     find("time[datetime='#{datetime.utc}']")
+  end
+
+  def localize_url(url)
+    uri = URI.parse(url)
+
+    if uri.query
+      "#{uri.path}?#{uri.query}"
+    else
+      uri.path
+    end
   end
 
   # The GH action runners are _slow_ and things like image generation or

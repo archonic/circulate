@@ -2,6 +2,8 @@ class UserMailer < Devise::Mailer
   default from: "Chicago Tool Library <team@chicagotoollibrary.org>"
   after_action :store_notification, only: [:reset_password_instructions]
 
+  layout "simple_mailer"
+
   def reset_password_instructions(record, token, opts = {})
     @user = record
     @subject = "You requested a password reset"

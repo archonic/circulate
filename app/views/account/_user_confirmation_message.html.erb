@@ -1,0 +1,15 @@
+<% if current_user.pending_confirmation_or_reconfirmation? %>
+  <div class="toast toast-warning">
+    <p>
+      <strong>Your email has not been confirmed.</strong>
+      You must confirm it before you can borrow items.
+      Please check your email for a message from <code>team@chicagotoollibrary.org</code>
+      with the title <code>Confirmation instructions</code>.
+    </p>
+
+    <%= form_for(current_user, url: confirmation_path(:user), html: {method: :post}) do |f| %>
+      <%= f.hidden_field :email, value: current_user.email_for_reconfirmation_instructions %>
+      <%= f.submit "Resend confirmation instructions", class: "btn btn-default btn-sm" %>
+    <% end %>
+  </div>
+<% end %>

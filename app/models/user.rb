@@ -1,6 +1,6 @@
 class User < ApplicationRecord
   devise :database_authenticatable, :recoverable, :rememberable,
-    :lockable, :timeoutable, :trackable, :validatable
+    :lockable, :timeoutable, :trackable, :validatable, :confirmable
 
   acts_as_tenant :library
 
@@ -35,6 +35,14 @@ class User < ApplicationRecord
 
   def has_role?(other)
     roles.include?(other.to_sym)
+  end
+
+  def pending_confirmation_or_reconfirmation?
+    !confirmed? || pending_reconfirmation?
+  end
+
+  def email_for_reconfirmation_instructions
+    pending_reconfirmation? ? unconfirmed_email : email
   end
 
   def self.serialize_from_session(key, salt)
