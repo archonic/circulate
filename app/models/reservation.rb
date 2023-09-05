@@ -2,7 +2,8 @@ class Reservation < ApplicationRecord
   enum status: {
     requested: "requested",
     approved: "approved",
-    rejected: "rejected"
+    rejected: "rejected",
+    changed: "changed"
   }
 
   validates :status, inclusion: {in: RenewalRequest.statuses.keys}

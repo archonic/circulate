@@ -1,0 +1,2 @@
+class ItemPool < ApplicationRecord
+end

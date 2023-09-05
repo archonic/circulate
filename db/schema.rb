@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2023_09_02_195237) do
+ActiveRecord::Schema.define(version: 2023_09_05_003505) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
   enable_extension "plpgsql"
@@ -71,7 +71,10 @@ ActiveRecord::Schema.define(version: 2023_09_02_195237) do
   create_enum :reservation_status, [
     "requested",
     "approved",
-    "rejected"
+    "rejected",
+    "fulfilled",
+    "cancelled",
+    "changed"
   ], force: :cascade
 
   create_enum :ticket_status, [
@@ -310,6 +313,12 @@ ActiveRecord::Schema.define(version: 2023_09_02_195237) do
     t.index ["item_id"], name: "index_item_attachments_on_item_id"
   end
 
+  create_table "item_pools", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
   create_table "items", force: :cascade do |t|
     t.string "name", null: false
     t.string "description"
@@ -336,8 +345,10 @@ ActiveRecord::Schema.define(version: 2023_09_02_195237) do
     t.string "purchase_link"
     t.integer "purchase_price_cents"
     t.string "myturn_item_type"
+    t.bigint "item_pools_id"
     t.index ["borrow_policy_id", "library_id"], name: "index_items_on_borrow_policy_id_and_library_id"
     t.index ["borrow_policy_id"], name: "index_items_on_borrow_policy_id"
+    t.index ["item_pools_id"], name: "index_items_on_item_pools_id"
     t.index ["library_id"], name: "index_items_on_library_id"
     t.index ["number", "library_id"], name: "index_items_on_number_and_library_id", unique: true
   end
@@ -474,6 +485,7 @@ ActiveRecord::Schema.define(version: 2023_09_02_195237) do
     t.string "reserveable_type", null: false
     t.bigint "reservable_id", null: false
     t.bigint "reservation_id", null: false
+    t.integer "quantity", default: 1, null: false
     t.bigint "created_by_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
@@ -483,14 +495,15 @@ ActiveRecord::Schema.define(version: 2023_09_02_195237) do
   end
 
   create_table "reservations", force: :cascade do |t|
-    t.datetime "started_at"
-    t.datetime "ended_at"
     t.enum "status", enum_type: "reservation_status"
     t.bigint "reserved_by_id", null: false
-    t.bigint "parent_reservation_id"
+    t.datetime "started_at"
+    t.datetime "ended_at"
+    t.string "notes"
+    t.bigint "initial_reservation_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.index ["parent_reservation_id"], name: "index_reservations_on_parent_reservation_id"
+    t.index ["initial_reservation_id"], name: "index_reservations_on_initial_reservation_id"
     t.index ["reserved_by_id"], name: "index_reservations_on_reserved_by_id"
   end
 
@@ -580,6 +593,7 @@ ActiveRecord::Schema.define(version: 2023_09_02_195237) do
   add_foreign_key "holds", "users", column: "creator_id"
   add_foreign_key "item_attachments", "items"
   add_foreign_key "item_attachments", "users", column: "creator_id"
+  add_foreign_key "items", "item_pools", column: "item_pools_id"
   add_foreign_key "loans", "items"
   add_foreign_key "loans", "loans", column: "initial_loan_id"
   add_foreign_key "loans", "members"
@@ -589,7 +603,7 @@ ActiveRecord::Schema.define(version: 2023_09_02_195237) do
   add_foreign_key "renewal_requests", "loans"
   add_foreign_key "reservation_line_items", "reservations"
   add_foreign_key "reservation_line_items", "users", column: "created_by_id"
-  add_foreign_key "reservations", "reservations", column: "parent_reservation_id"
+  add_foreign_key "reservations", "reservations", column: "initial_reservation_id"
   add_foreign_key "reservations", "users", column: "reserved_by_id"
   add_foreign_key "ticket_updates", "audits"
   add_foreign_key "ticket_updates", "tickets"
