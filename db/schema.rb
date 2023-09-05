@@ -74,7 +74,7 @@ ActiveRecord::Schema.define(version: 2023_09_05_003505) do
     "rejected",
     "fulfilled",
     "cancelled",
-    "changed"
+    "replaced"
   ], force: :cascade
 
   create_enum :ticket_status, [
@@ -345,10 +345,10 @@ ActiveRecord::Schema.define(version: 2023_09_05_003505) do
     t.string "purchase_link"
     t.integer "purchase_price_cents"
     t.string "myturn_item_type"
-    t.bigint "item_pools_id"
+    t.bigint "item_pool_id"
     t.index ["borrow_policy_id", "library_id"], name: "index_items_on_borrow_policy_id_and_library_id"
     t.index ["borrow_policy_id"], name: "index_items_on_borrow_policy_id"
-    t.index ["item_pools_id"], name: "index_items_on_item_pools_id"
+    t.index ["item_pool_id"], name: "index_items_on_item_pool_id"
     t.index ["library_id"], name: "index_items_on_library_id"
     t.index ["number", "library_id"], name: "index_items_on_number_and_library_id", unique: true
   end
@@ -482,21 +482,21 @@ ActiveRecord::Schema.define(version: 2023_09_05_003505) do
   end
 
   create_table "reservation_line_items", force: :cascade do |t|
-    t.string "reserveable_type", null: false
+    t.string "reservable_type", null: false
     t.bigint "reservable_id", null: false
     t.bigint "reservation_id", null: false
     t.integer "quantity", default: 1, null: false
-    t.bigint "created_by_id", null: false
+    t.bigint "creator_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.index ["created_by_id"], name: "index_reservation_line_items_on_created_by_id"
-    t.index ["reservable_id"], name: "index_reservation_line_items_on_reservable_id"
+    t.index ["creator_id"], name: "index_reservation_line_items_on_creator_id"
+    t.index ["reservable_type", "reservable_id"], name: "index_reservation_line_items_on_reservable"
     t.index ["reservation_id"], name: "index_reservation_line_items_on_reservation_id"
   end
 
   create_table "reservations", force: :cascade do |t|
     t.enum "status", enum_type: "reservation_status"
-    t.bigint "reserved_by_id", null: false
+    t.bigint "reserver_id", null: false
     t.datetime "started_at"
     t.datetime "ended_at"
     t.string "notes"
@@ -504,7 +504,7 @@ ActiveRecord::Schema.define(version: 2023_09_05_003505) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["initial_reservation_id"], name: "index_reservations_on_initial_reservation_id"
-    t.index ["reserved_by_id"], name: "index_reservations_on_reserved_by_id"
+    t.index ["reserver_id"], name: "index_reservations_on_reserver_id"
   end
 
   create_table "short_links", force: :cascade do |t|
@@ -593,7 +593,7 @@ ActiveRecord::Schema.define(version: 2023_09_05_003505) do
   add_foreign_key "holds", "users", column: "creator_id"
   add_foreign_key "item_attachments", "items"
   add_foreign_key "item_attachments", "users", column: "creator_id"
-  add_foreign_key "items", "item_pools", column: "item_pools_id"
+  add_foreign_key "items", "item_pools"
   add_foreign_key "loans", "items"
   add_foreign_key "loans", "loans", column: "initial_loan_id"
   add_foreign_key "loans", "members"
@@ -602,9 +602,9 @@ ActiveRecord::Schema.define(version: 2023_09_05_003505) do
   add_foreign_key "notifications", "members"
   add_foreign_key "renewal_requests", "loans"
   add_foreign_key "reservation_line_items", "reservations"
-  add_foreign_key "reservation_line_items", "users", column: "created_by_id"
+  add_foreign_key "reservation_line_items", "users", column: "creator_id"
   add_foreign_key "reservations", "reservations", column: "initial_reservation_id"
-  add_foreign_key "reservations", "users", column: "reserved_by_id"
+  add_foreign_key "reservations", "users", column: "reserver_id"
   add_foreign_key "ticket_updates", "audits"
   add_foreign_key "ticket_updates", "tickets"
   add_foreign_key "ticket_updates", "users", column: "creator_id"

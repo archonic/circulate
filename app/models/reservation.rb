@@ -3,10 +3,13 @@ class Reservation < ApplicationRecord
     requested: "requested",
     approved: "approved",
     rejected: "rejected",
-    changed: "changed"
-  }
+    replaced: "replaced",
+    cancelled: "cancelled",
+    fulfilled: "fulfilled"
+  }, _default: :requested
 
   validates :status, inclusion: {in: RenewalRequest.statuses.keys}
 
-  belongs_to :reserved_by, class_name: User
+  belongs_to :reserver, class_name: "User"
+  has_many :line_items, class_name: "ReservationLineItem"
 end

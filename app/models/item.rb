@@ -44,6 +44,7 @@ class Item < ApplicationRecord
   end
 
   belongs_to :borrow_policy
+  belongs_to :item_pool
   has_many :notes, as: :notable, dependent: :destroy
   has_many :attachments, class_name: "ItemAttachment", dependent: :destroy
 
